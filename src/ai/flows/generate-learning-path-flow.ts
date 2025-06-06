@@ -28,7 +28,7 @@ export type LearningStep = z.infer<typeof LearningStepSchema>;
 
 const LearningResourceSchema = z.object({
   title: z.string().describe('The title of the recommended resource.'),
-  url: z.string().url().describe('The URL to access the resource.'),
+  url: z.string().describe('The URL to access the resource.'), // Removed .url()
   type: z.enum(['article', 'video', 'course', 'documentation', 'interactive_tutorial', 'book', 'tool']).describe('The type of the resource.'),
   briefExplanation: z.string().describe('A short explanation of why this resource is recommended and what it covers.'),
 });
