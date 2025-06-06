@@ -77,7 +77,7 @@ export default function Home() {
       </main>
       <footer className="mt-12 text-center text-sm text-muted-foreground">
         <p>&copy; {new Date().getFullYear()} PathAI. All rights reserved.</p>
-        <p>Powered by Firebase and Genkit</p>
+        <p>Powered by Dev Ocansey</p>
       </footer>
     </div>
   );
