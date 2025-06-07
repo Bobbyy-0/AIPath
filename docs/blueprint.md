@@ -1,4 +1,4 @@
-# **App Name**: PathAI
+# **App Name**: AISkillPath
 
 ## Core Features:
 
