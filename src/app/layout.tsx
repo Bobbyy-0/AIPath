@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'PathAI',
+  title: 'AIPath',
   description: 'Personalized Learning Paths with AI',
 };
 
