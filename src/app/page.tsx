@@ -57,14 +57,14 @@ export default function Home() {
       <header className="mb-10 text-center">
         <div className="flex items-center justify-center mb-2">
           <BrainCircuit className="h-12 w-12 text-primary" />
-          <h1 className="ml-3 text-5xl font-bold text-primary">PathAI</h1>
+          <h1 className="ml-3 text-5xl font-bold text-primary">AIPath</h1>
         </div>
         <p className="text-xl text-muted-foreground">
           Your personal AI guide to a brighter learning future.
         </p>
       </header>
 
-      <main className="w-full max-w-4xl space-y-8">
+      <main className="w-full max-w-4xl space-y-8 flex flex-col items-center">
         <InputForm onSubmit={handleFormSubmit} isLoading={isLoading} />
 
         {(learningPathData || isLoading || error) && (
