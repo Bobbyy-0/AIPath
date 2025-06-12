@@ -54,9 +54,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
-      <header className="mb-10 text-center">
+      <header className="mb-10 text-center">        
         <div className="flex items-center justify-center mb-2">
-          <BrainCircuit className="h-12 w-12 text-primary" />
           <h1 className="ml-3 text-5xl font-bold text-primary">AIPath</h1>
         </div>
         <p className="text-xl text-muted-foreground">
@@ -76,7 +75,7 @@ export default function Home() {
         )}
       </main>
       <footer className="mt-12 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} PathAI. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} AIPath. All rights reserved.</p>
         <p>Powered by Dev Ocansey</p>
       </footer>
     </div>
