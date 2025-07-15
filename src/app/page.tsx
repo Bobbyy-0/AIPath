@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BrainCircuit } from "lucide-react";
 
 
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [learningPathData, setLearningPathData] = useState<LearningStep[] | null>(null);
@@ -68,7 +69,9 @@ export default function Home() {
 
         {(learningPathData || isLoading || error) && (
            <div className="space-y-8">
-            <LearningPathDisplay path={learningPathData} isLoading={isLoading} error={error} />
+            <LearningPathDisplay path={learningPathData} isLoading={isLoading} error={error} onQuizRequest={function (topic: string): void {
+              throw new Error("Function not implemented.");
+            } } />
             <Separator />
             <ResourceRecommendationsDisplay resources={resourcesData} isLoading={isLoading} error={error} />
            </div>
