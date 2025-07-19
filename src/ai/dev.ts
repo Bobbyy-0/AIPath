@@ -2,4 +2,4 @@
 import './flows/generate-learning-path-flow';
 import './flows/refine-learning-path-flow';
 import './flows/refine-learning-path-flow';
-import './flows/chat-with-mentor-flow';
+import './flows/generate-quiz-flow';
