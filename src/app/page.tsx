@@ -6,51 +6,49 @@ import type { InputFormValues } from "@/components/pathai/input-form";
 import { InputForm } from "@/components/pathai/input-form";
 import { LearningPathDisplay } from "@/components/pathai/learning-path-display";
 import { ResourceRecommendationsDisplay } from "@/components/pathai/resource-recommendations-display";
-import type { GenerateLearningPathOutput, LearningStep, LearningResource } from "@/ai/flows/generate-learning-path-flow";
+import type { GenerateLearningPathOutput } from "@/ai/flows/generate-learning-path-flow";
 import { generateLearningPath } from "@/ai/flows/generate-learning-path-flow";
 import { refineLearningPath } from "@/ai/flows/refine-learning-path-flow";
 import type { RefineLearningPathInput } from "@/ai/flows/refine-learning-path-flow";
 import type { RefineFormValues } from "@/components/pathai/refine-path-form";
 import { RefinePathForm } from "@/components/pathai/refine-path-form";
 import { useToast } from "@/hooks/use-toast";
-import { BrainCircuit, Loader2, TestTube2 } from "lucide-react";
+import { BrainCircuit, Loader2 } from "lucide-react";
+
 import { generateQuiz } from "@/ai/flows/generate-quiz-flow";
-import type { QuizQuestion } from "@/ai/flows/generate-quiz-flow";
+import type { GenerateQuizOutput } from "@/ai/schemas/quiz-schemas";
 import { QuizModal } from "@/components/pathai/quiz-modal";
 import { Button } from "@/components/ui/button";
 
+type AppState = "input" | "result";
 
 export default function Home() {
+  const [appState, setAppState] = useState<AppState>("input");
   const [isLoading, setIsLoading] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
-  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
-  const [learningPathData, setLearningPathData] = useState<LearningStep[] | null>(null);
-  const [resourcesData, setResourcesData] = useState<LearningResource[] | null>(null);
   const [rawLearningPathOutput, setRawLearningPathOutput] = useState<GenerateLearningPathOutput | null>(null);
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[] | null>(null);
-  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleFormSubmit = async (values: InputFormValues) => {
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+  const [quizData, setQuizData] = useState<GenerateQuizOutput | null>(null);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+
+
+  const handleInitialSubmit = async (values: InputFormValues) => {
     setIsLoading(true);
     setError(null);
-    setLearningPathData(null);
-    setResourcesData(null);
     setRawLearningPathOutput(null);
-    setQuizQuestions(null);
 
     try {
-      const result: GenerateLearningPathOutput = await generateLearningPath(values);
+      const result = await generateLearningPath(values);
       if (result.learningPath && result.recommendedResources) {
-        setLearningPathData(result.learningPath);
-        setResourcesData(result.recommendedResources);
         setRawLearningPathOutput(result);
+        setAppState("result");
       } else {
         throw new Error("AI response was incomplete. Missing path or resources.");
       }
-    } catch (e: any)
-    {
+    } catch (e: any) {
       console.error("Error generating learning path:", e);
       const errorMessage = e.message || "An unexpected error occurred. Please try again.";
       setError(errorMessage);
@@ -59,6 +57,7 @@ export default function Home() {
         description: errorMessage,
         variant: "destructive",
       });
+      setAppState("input");
     } finally {
       setIsLoading(false);
     }
@@ -75,8 +74,7 @@ export default function Home() {
     }
 
     setIsRefining(true);
-    setError(null); 
-    setQuizQuestions(null);
+    setError(null);
 
     try {
       const refineInput: RefineLearningPathInput = {
@@ -86,8 +84,6 @@ export default function Home() {
       const result: GenerateLearningPathOutput = await refineLearningPath(refineInput);
 
       if (result.learningPath && result.recommendedResources) {
-        setLearningPathData(result.learningPath);
-        setResourcesData(result.recommendedResources);
         setRawLearningPathOutput(result);
       } else {
         throw new Error("AI response for refinement was incomplete.");
@@ -95,7 +91,7 @@ export default function Home() {
     } catch (e: any) {
       console.error("Error refining learning path:", e);
       const errorMessage = e.message || "An unexpected error occurred during refinement.";
-      setError(errorMessage); 
+      setError(errorMessage);
       toast({
         title: "Refinement Error",
         description: errorMessage,
@@ -110,23 +106,22 @@ export default function Home() {
     if (!rawLearningPathOutput) {
       toast({
         title: "Error",
-        description: "Cannot generate a quiz without a learning path.",
-        variant: "destructive"
+        description: "A learning path must be generated before creating a quiz.",
+        variant: "destructive",
       });
       return;
     }
+
     setIsGeneratingQuiz(true);
+    setQuizData(null);
+
     try {
-      const result = await generateQuiz({ learningPath: rawLearningPathOutput });
-      if (result.quiz && result.quiz.length > 0) {
-        setQuizQuestions(result.quiz);
-        setIsQuizModalOpen(true);
-      } else {
-        throw new Error("The AI did not return any quiz questions.");
-      }
+      const result = await generateQuiz({ learningPath: rawLearningPathOutput.learningPath });
+      setQuizData(result);
+      setIsQuizModalOpen(true);
     } catch (e: any) {
-       console.error("Error generating quiz:", e);
-      const errorMessage = e.message || "An unexpected error occurred while creating the quiz.";
+      console.error("Error generating quiz:", e);
+      const errorMessage = e.message || "Failed to generate the quiz. Please try again.";
       toast({
         title: "Quiz Generation Error",
         description: errorMessage,
@@ -136,9 +131,17 @@ export default function Home() {
       setIsGeneratingQuiz(false);
     }
   };
-  
+
+
+  const restart = () => {
+    setAppState("input");
+    setRawLearningPathOutput(null);
+    setError(null);
+  }
+
   const overallIsLoading = isLoading || isRefining;
-  const showResults = learningPathData || overallIsLoading || error;
+  const learningPathData = rawLearningPathOutput?.learningPath ?? null;
+  const resourcesData = rawLearningPathOutput?.recommendedResources ?? null;
 
   return (
     <>
@@ -158,12 +161,20 @@ export default function Home() {
         </header>
 
         <main className="w-full max-w-7xl flex flex-col items-center">
-          <InputForm onSubmit={handleFormSubmit} isLoading={isLoading} />
+          {appState === 'input' && <InputForm onSubmit={handleInitialSubmit} isLoading={isLoading} />}
           
-          {showResults && (
+          {isLoading && appState !== 'input' && (
+             <div className="flex flex-col items-center justify-center text-center p-8">
+                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                <h2 className="text-2xl font-semibold">Generating Your Custom Path...</h2>
+                <p className="text-muted-foreground">This may take a moment.</p>
+             </div>
+          )}
+
+          {appState === 'result' && (
             <div className="w-full mt-16 grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
               <div className="lg:col-span-3">
-                <LearningPathDisplay 
+                <LearningPathDisplay
                   path={learningPathData}
                   isLoading={overallIsLoading}
                   error={error} onQuizRequest={function (topic: string): void {
@@ -176,26 +187,16 @@ export default function Home() {
             </div>
           )}
 
-          {rawLearningPathOutput && !overallIsLoading && !error && (
-            <div className="text-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                <Button size="lg" onClick={handleGenerateQuiz} disabled={isGeneratingQuiz}>
-                  {isGeneratingQuiz ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Building Quiz...
-                    </>
-                  ) : (
-                    <>
-                      <TestTube2 className="mr-2 h-5 w-5" />
-                      Test Your Knowledge
-                    </>
-                  )}
-                </Button>
-            </div>
-          )}
-
-          {rawLearningPathOutput && !overallIsLoading && !error && (
-            <div className="w-full mt-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+          {appState === 'result' && rawLearningPathOutput && !overallIsLoading && !error && (
+            <div className="w-full mt-12 animate-fade-in-up space-y-4 text-center" style={{ animationDelay: '0.4s' }}>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Button onClick={handleGenerateQuiz} disabled={isGeneratingQuiz} size="lg">
+                        {isGeneratingQuiz ? (
+                            <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating Quiz...</>
+                        ) : "Test Your Knowledge"}
+                    </Button>
+                    <button onClick={restart} className="text-primary hover:underline">Start Over</button>
+                </div>
               <RefinePathForm onSubmit={handleRefineSubmit} isLoading={isRefining} />
             </div>
           )}
@@ -206,11 +207,12 @@ export default function Home() {
           <p>Powered by Firebase and Genkit</p>
         </footer>
       </div>
-      {quizQuestions && (
+
+       {quizData && (
         <QuizModal
           isOpen={isQuizModalOpen}
-          onOpenChange={setIsQuizModalOpen}
-          questions={quizQuestions}
+          onClose={() => setIsQuizModalOpen(false)}
+          quiz={quizData}
         />
       )}
     </>
