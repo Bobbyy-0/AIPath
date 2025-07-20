@@ -130,14 +130,7 @@ export function LearningPathDisplay({ path, isLoading, error, onQuizRequest }: L
                               </div>
                             </div>
                            )}
-                           <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => onQuizRequest(step.keyTopics?.join(', ') || step.title)}
-                           >
-                             <Sparkles className="mr-2 h-4 w-4"/>
-                             Test Your Knowledge
-                           </Button>
+                          
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>

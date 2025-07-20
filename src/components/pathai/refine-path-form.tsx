@@ -46,7 +46,6 @@ export function RefinePathForm({ onSubmit, isLoading }: RefinePathFormProps) {
     <Card className="w-full max-w-3xl shadow-2xl transition-shadow duration-300 mx-auto border border-primary/20 bg-card backdrop-blur-sm">
       <CardHeader className="text-center">
         <CardTitle className="flex items-center justify-center text-3xl">
-          <Wand2 className="mr-3 text-primary" />
           Refine Your Path
         </CardTitle>
         <CardDescription>Want to make changes? Let the AI know how to adjust your path.</CardDescription>
@@ -71,10 +70,9 @@ export function RefinePathForm({ onSubmit, isLoading }: RefinePathFormProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isLoading} size="lg" className="w-full text-xl font-semibold bg-gradient-to-br from-primary via-purple-500 to-indigo-600 text-primary-foreground transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/50 disabled:hover:scale-100">
+            <Button type="submit" disabled={isLoading} size="lg" className="w-full text-xl font-semibold ">
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-6 w-6 animate-spin" />
                   Refining Path...
                 </>
               ) : (
