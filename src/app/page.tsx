@@ -13,7 +13,10 @@ import type { RefineLearningPathInput } from "@/ai/flows/refine-learning-path-fl
 import type { RefineFormValues } from "@/components/pathai/refine-path-form";
 import { RefinePathForm } from "@/components/pathai/refine-path-form";
 import { useToast } from "@/hooks/use-toast";
-import { BrainCircuit, Loader2 } from "lucide-react";
+import { BrainCircuit, Download, Loader2 } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 
 import { generateQuiz } from "@/ai/flows/generate-quiz-flow";
 import type { GenerateQuizOutput } from "@/ai/schemas/quiz-schemas";
@@ -132,6 +135,117 @@ export default function Home() {
     }
   };
 
+   const handleDownloadPath = () => {
+    if (rawLearningPathOutput) {
+      try {
+        const doc = new jsPDF();
+        const { learningPath, recommendedResources } = rawLearningPathOutput;
+
+        // Title
+        doc.setFontSize(22);
+        doc.text("Your Personalized Learning Path", 105, 20, { align: "center" });
+
+        // Learning Path Steps
+        doc.setFontSize(16);
+        doc.text("Learning Steps", 14, 35);
+        let yPos = 45;
+        learningPath.forEach((step, index) => {
+          if (yPos > 270) { // Check for page break
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.setFontSize(12);
+          doc.setFont("helvetica", "bold");
+          doc.text(`Step ${index + 1}: ${step.title}`, 14, yPos);
+          yPos += 7;
+          
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "normal");
+          const descriptionLines = doc.splitTextToSize(step.description, 180);
+          doc.text(descriptionLines, 14, yPos);
+          yPos += descriptionLines.length * 5 + 5;
+
+          doc.setFont("helvetica", "bold");
+          doc.text("Key Topics:", 14, yPos);
+          yPos += 5;
+          doc.setFont("helvetica", "normal");
+          step.keyTopics.forEach(topic => {
+            if (yPos > 280) { // Check for page break
+              doc.addPage();
+              yPos = 20;
+            }
+            doc.text(`- ${topic}`, 16, yPos);
+            yPos += 5;
+          });
+          yPos += 5;
+        });
+
+        // Recommended Resources Table
+        if (yPos > 250) { // Check for page break before table
+          doc.addPage();
+          yPos = 20;
+        } else {
+            yPos += 10;
+        }
+
+        doc.setFontSize(16);
+        doc.text("Recommended Resources", 14, yPos);
+        yPos += 10;
+         const tableBody = recommendedResources.map(r => [
+            r.title,
+            r.type.replace(/_/g, ' '),
+            r.briefExplanation,
+            r.url // Hidden column for the URL
+        ]);
+         autoTable(doc, {
+          startY: yPos + 10,
+          head: [['Title', 'Type', 'Explanation']],
+          body: tableBody,
+          // Exclude the last column (URL) from being rendered
+          columns: [
+            { header: 'Title', dataKey: 0 },
+            { header: 'Type', dataKey: 1 },
+            { header: 'Explanation', dataKey: 2 },
+          ],
+          theme: 'striped',
+          headStyles: { fillColor: [37, 24, 79] }, // Using a purple color for header
+          didDrawCell: (data) => {
+            // Check if it's the 'Title' column (index 0) and not in the header
+            if (data.column.index === 0 && data.cell.section === 'body') {
+              // The URL is in the hidden 4th column of our original body data
+              const url = tableBody[data.row.index][3];
+              if (url) {
+                // Add a link annotation
+                doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url });
+                // Style the text to look like a link
+                doc.setTextColor("#0000EE"); // Blue color
+                doc.setFont("helvetica", "normal", "underline");
+              }
+            }
+          },
+          willDrawCell: (data) => {
+            // Reset text color and style for all other cells
+            doc.setTextColor("#000000"); // Black color
+            doc.setFont("helvetica", "normal");
+          }
+        });
+        doc.save('aipath-learning-path.pdf');
+toast({
+          title: "Download Started",
+          description: "Your learning path PDF is being generated.",
+        });
+      } catch (e) {
+        console.error("Failed to generate or download PDF", e);
+        toast({
+          title: "Download Error",
+          description: "Could not prepare the learning path PDF for download.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+
 
   const restart = () => {
     setAppState("input");
@@ -185,6 +299,11 @@ export default function Home() {
           {appState === 'result' && rawLearningPathOutput && !overallIsLoading && !error && (
             <div className="w-full mt-12 animate-fade-in-up space-y-4 text-center" style={{ animationDelay: '0.4s' }}>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Button onClick={handleDownloadPath} variant="outline">
+                      <Download className="mr-2 h-5 w-5" />
+                       Download Path
+                      Download Path (PDF)
+                    </Button>
                     <Button onClick={handleGenerateQuiz} disabled={isGeneratingQuiz} size="lg">
                         {isGeneratingQuiz ? (
                             <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Generating Quiz...</>
