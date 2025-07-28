@@ -18,9 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2, Sparkles, Wand } from "lucide-react";
 import { Textarea } from "../ui/textarea";
-import { useState } from "react";
-import { generateSuggestion } from "@/ai/flows/generate-suggestion-flow";
-import { useToast } from "@/hooks/use-toast";
+
 
 export const formSchema = z.object({
   interests: z.string().min(10, "Please describe your interests in at least 10 characters."),
@@ -36,8 +34,7 @@ interface InputFormProps {
 }
 
 export function InputForm({ onSubmit, isLoading }: InputFormProps) {
-  const [isSuggesting, setIsSuggesting] = useState(false);
-  const { toast } = useToast();
+
 
   const form = useForm<InputFormValues>({
     resolver: zodResolver(formSchema),
@@ -48,25 +45,7 @@ export function InputForm({ onSubmit, isLoading }: InputFormProps) {
     },
   });
 
-  const handleSurpriseMe = async () => {
-    setIsSuggesting(true);
-    try {
-      const result = await generateSuggestion();
-      if (result.suggestion) {
-        form.setValue("interests", result.suggestion, { shouldValidate: true });
-      }
-    } catch (e: any) {
-      console.error("Error generating suggestion:", e);
-      toast({
-        title: "Suggestion Error",
-        description: e.message || "Could not generate a suggestion. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSuggesting(false);
-    }
-  };
-
+  
 
   return (
     <Card className="w-full max-w-3xl shadow-2xl transition-shadow duration-300 border border-primary/20 bg-card backdrop-blur-sm">
@@ -75,30 +54,14 @@ export function InputForm({ onSubmit, isLoading }: InputFormProps) {
         <CardDescription>Tell us about yourself, and we'll generate a personalized roadmap.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
+         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
               name="interests"
-              render={({ field }) => (
+              render={({ field }: { field: import("react-hook-form").ControllerRenderProps<InputFormValues, "interests"> }) => (
                 <FormItem>
-                  <div className="flex items-center justify-between">
-                    <FormLabel className="text-lg">Your Interests?</FormLabel>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleSurpriseMe}
-                      disabled={isSuggesting}
-                    >
-                      {isSuggesting ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Wand className="mr-2 h-4 w-4" />
-                      )}
-                      Surprise Me
-                    </Button>
-                  </div>
+                  <FormLabel className="text-lg">What are your interests?</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g., Web development, machine learning, data science..."
@@ -115,7 +78,7 @@ export function InputForm({ onSubmit, isLoading }: InputFormProps) {
              <FormField
               control={form.control}
               name="currentKnowledge"
-              render={({ field }) => (
+              render={({ field }: { field: import("react-hook-form").ControllerRenderProps<InputFormValues, "currentKnowledge"> }) => (
                 <FormItem>
                   <FormLabel className="text-lg">Current Knowledge Level?</FormLabel>
                   <FormControl>
@@ -134,7 +97,7 @@ export function InputForm({ onSubmit, isLoading }: InputFormProps) {
              <FormField
               control={form.control}
               name="careerGoals"
-              render={({ field }) => (
+              render={({ field }: { field: import("react-hook-form").ControllerRenderProps<InputFormValues, "careerGoals"> }) => (
                 <FormItem>
                   <FormLabel className="text-lg">Career Goals?</FormLabel>
                   <FormControl>
