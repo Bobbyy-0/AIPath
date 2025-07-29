@@ -61,7 +61,7 @@ export function InputForm({ onSubmit, isLoading }: InputFormProps) {
               name="interests"
               render={({ field }: { field: import("react-hook-form").ControllerRenderProps<InputFormValues, "interests"> }) => (
                 <FormItem>
-                  <FormLabel className="text-lg">What are your interests?</FormLabel>
+                  <FormLabel className="text-lg">Your interests?</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g., Web development, machine learning, data science..."
