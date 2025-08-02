@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BrainCircuit } from 'lucide-react';
+import { ArrowRight, } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LandingPage() {
@@ -18,7 +18,7 @@ export default function LandingPage() {
       <main>
         <div className="flex flex-col items-center space-y-6">
           <p className="text-lg text-foreground">Ready to start your journey?</p>
-          <Button asChild size="lg" className="text-xl font-semibold ">
+          <Button asChild size="lg" className="text-xl font-semibold bg-gradient-to-b from-primary via-purple-500 to-indigo-600  ">
             <Link href="/path">
               Get Started
               <ArrowRight className="ml-2 h-6 w-6" />
@@ -28,12 +28,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="absolute bottom-8 text-center text-sm text-muted-foreground space-y-2">
-        <div>
-          <Link href="/presentation" className="text-primary hover:underline">
-            Learn More About The Project
-          </Link>
-        </div>
-        <p>&copy; {new Date().getFullYear()} AIPath. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} AIPath. All rights reserved.</p>
       </footer>
     </div>
   );

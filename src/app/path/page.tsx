@@ -309,11 +309,9 @@ export default function Home() {
       <div className="flex flex-col items-center justify-start min-h-screen p-4 md:p-8 animate-fade-in">
         <header className="mb-12 text-center w-full max-w-4xl">
           <div className="flex items-center justify-center mb-4">
-            <div className="p-3 bg-primary/10 rounded-full border border-primary/20 shadow-inner">
-               <BrainCircuit className="h-10 w-10 text-primary" />
-            </div>
+            
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-br from-primary via-purple-500 to-indigo-600 text-transparent bg-clip-text">
+          <h1 className="text-5xl md:text-7xl font-bold ">
             AIPath
           </h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -351,9 +349,7 @@ export default function Home() {
           {appState === 'result' && rawLearningPathOutput && !overallIsLoading && !error && (
             <div className="w-full mt-12 animate-fade-in-up space-y-4 text-center" style={{ animationDelay: '0.4s' }}>
                 <div className="flex flex-wrap items-center justify-center gap-4">
-                     <Button onClick={handleSavePath} variant="outline">
-                        Save Path
-                    </Button>
+                     
                      <Button onClick={handleDownloadPath} variant="outline">
                       <Download className="mr-2 h-5 w-5" />
                       Download Path (PDF)
@@ -372,9 +368,7 @@ export default function Home() {
 
         <footer className="mt-24 text-center text-sm text-muted-foreground space-y-2">
             <div>
-                 <Link href="/presentation" className="text-primary hover:underline">
-                    View Presentation
-                </Link>
+                 
             </div>
           <p>&copy; {new Date().getFullYear()} AIPath. All rights reserved.</p>
         </footer>
