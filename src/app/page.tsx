@@ -19,10 +19,10 @@ export default function LandingPage() {
         <div className="flex flex-col items-center space-y-6">
           <p className="text-lg text-foreground">Ready to start your journey?</p>
           <Button asChild size="lg" className="text-xl font-semibold bg-gradient-to-b from-primary via-blue-500 to-cyan-600   hover:scale-105 hover:shadow-lg hover:shadow-primary/50">
-            <Link href="/path">
-              Get Started
-              <ArrowRight className="ml-2 h-6 w-6" />
-            </Link>
+            <Link href="/features">
+            Get Started
+            <ArrowRight className="ml-2 h-6 w-6" />
+          </Link>
           </Button>
         </div>
       </main>

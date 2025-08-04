@@ -13,7 +13,7 @@ import type { RefineLearningPathInput } from "@/ai/flows/refine-learning-path-fl
 import type { RefineFormValues } from "@/components/pathai/refine-path-form";
 import { RefinePathForm } from "@/components/pathai/refine-path-form";
 import { useToast } from "@/hooks/use-toast";
-import { BrainCircuit, Loader2, Download } from "lucide-react";
+import { BrainCircuit, Loader2, Download, ArrowLeft } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -23,10 +23,12 @@ import type { GenerateQuizOutput } from "@/ai/schemas/quiz-schemas";
 import { QuizModal } from "@/components/pathai/quiz-modal";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type AppState = "input" | "result";
 
 export default function Home() {
+  const router = useRouter();
   const [appState, setAppState] = useState<AppState>("input");
   const [isLoading, setIsLoading] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
@@ -304,10 +306,14 @@ export default function Home() {
   const learningPathData = rawLearningPathOutput?.learningPath ?? null;
   const resourcesData = rawLearningPathOutput?.recommendedResources ?? null;
 
+
   return (
     <>
       <div className="flex flex-col items-center justify-start min-h-screen p-4 md:p-8 animate-fade-in">
         <header className="mb-12 text-center w-full max-w-4xl">
+           <Button variant="outline" onClick={() => router.push('/')} className="absolute top-4 left-4">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
+            </Button>
           <div className="flex items-center justify-center mb-4">
             
           </div>
